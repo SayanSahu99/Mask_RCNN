@@ -946,6 +946,10 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     mrcnn_probs = KL.TimeDistributed(KL.Activation("softmax"),
                                      name="mrcnn_class")(mrcnn_class_logits)
 
+    #added
+    mrcnn_probs = KL.TimeDistributed(KL.Activation("softmax"),
+                                     name="mrcnn_class_1")(mrcnn_class_logits)
+
     # BBox head
     # [batch, num_rois, NUM_CLASSES * (dy, dx, log(dh), log(dw))]
     x = KL.TimeDistributed(KL.Dense(num_classes * 4, activation='linear'),
