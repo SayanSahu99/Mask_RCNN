@@ -860,6 +860,10 @@ def rpn_graph(feature_map, anchors_per_location, anchor_stride):
     rpn_probs = KL.Activation(
         "softmax", name="rpn_class_xxx")(rpn_class_logits)
 
+    # Added
+    x = KL.Conv2D(anchors_per_location * 4, (1, 1), padding="same",
+                  activation='relu', name='rpn_bbox_pred_1')(shared)
+
     # Bounding box refinement. [batch, H, W, anchors per location * depth]
     # where depth is [x, y, log(w), log(h)]
     x = KL.Conv2D(anchors_per_location * 4, (1, 1), padding="valid",
