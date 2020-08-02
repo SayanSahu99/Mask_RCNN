@@ -2518,10 +2518,7 @@ class MaskRCNN():
         self.log_dir = os.path.join(self.model_dir, "{}{:%Y%m%dT%H%M}".format(
             self.config.NAME.lower(), now))
 
-        if self.config.RUN_NAME:
-            # Directory for training logs
-            self.log_dir = os.path.join(self.model_dir, "{}_{}_{:%Y%m%dT%H%M}".format(
-                self.config.NAME.lower(), self.config.RUN_NAME, now))
+       
 
         # Create log_dir if not exists
         if not os.path.exists(self.log_dir):
