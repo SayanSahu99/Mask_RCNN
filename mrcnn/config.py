@@ -189,6 +189,7 @@ class Config(object):
         "rpn_bbox_loss": 1.,
         "mrcnn_class_loss": 1.,
         "mrcnn_bbox_loss": 1.,
+        "mrcnn_mask_edge_loss":1.,
         "mrcnn_mask_loss": 1.
     }
 
@@ -214,6 +215,8 @@ class Config(object):
     EDGE_LOSS_NORM = "l2"
     EDGE_LOSS_WEIGHT_FACTOR = 1.0
     EDGE_LOSS_WEIGHT_ENTROPY = False
+    EDGE_LOSS_SMOOTHING_PREDICTIONS= False
+    EDGE_LOSS_SMOOTHING_GT= False 
 
     def __init__(self):
         """Set values of computed attributes."""
@@ -237,3 +240,5 @@ class Config(object):
             if not a.startswith("__") and not callable(getattr(self, a)):
                 print("{:30} {}".format(a, getattr(self, a)), file=file)
         print("\n", file=file)
+
+
