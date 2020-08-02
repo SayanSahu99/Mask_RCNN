@@ -2319,8 +2319,7 @@ class MaskRCNN():
         dir_names = next(os.walk(self.model_dir))[1]
         key = self.config.NAME.lower()
 
-        if self.config.RUN_NAME:
-            key += "_" + self.config.RUN_NAME
+        
 
         dir_names = filter(lambda f: f.startswith(key), dir_names)
         dir_names = sorted(dir_names)
