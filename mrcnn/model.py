@@ -1251,7 +1251,7 @@ def mrcnn_mask_edge_loss_graph(y_pred, y_true, edge_filters, smoothing_predictio
         "l4": 4,
         "l5": 5
     }
-    print(nsjnfdjsk)
+    
     if norm not in lp_norm_map:
         raise ValueError("The `norm` '{0}' is not supported. Supported values are: [l1...l5]".format(norm))
 
