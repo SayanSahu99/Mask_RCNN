@@ -313,7 +313,7 @@ def resnet152_graph(input_image, architecture, stage5=False, train_bn=True):
 
     # Handle Dimension Ordering for different backends
     global bn_axis
-    if K.image_dim_ordering() == 'tf':
+    if K.image_data_format() == 'tf':
       bn_axis = 3
      
     else:
