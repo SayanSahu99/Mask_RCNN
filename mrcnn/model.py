@@ -349,10 +349,7 @@ def resnet152_graph(input_image, architecture, stage5=False, train_bn=True):
         x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a', train_bn=train_bn)
         x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b', train_bn=train_bn)
         x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c', train_bn=train_bn)
-        x_fc = AveragePooling2D((7, 7), name='avg_pool')(x)
-        x_fc = Flatten()(x_fc)
-        x_fc = Dense(1000, activation='softmax', name='fc1000')(x_fc)
-        C5 = x_fc
+        C5 = x
     else:
         C5 = None
     return [C1, C2, C3, C4, C5]
