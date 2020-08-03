@@ -309,6 +309,16 @@ def resnet152_graph(input_image, architecture, stage5=False, train_bn=True):
         stage5: Boolean. If False, stage5 of the network is not created
         train_bn: Boolean. Train or freeze Batch Norm layres
     """
+    eps = 1.1e-5
+
+    # Handle Dimension Ordering for different backends
+    global bn_axis
+    if K.image_dim_ordering() == 'tf':
+      bn_axis = 3
+     
+    else:
+      bn_axis = 1
+      
     assert architecture in ["resnet152"]
     x = KL.ZeroPadding2D((3, 3))(input_image)
     x = KL.Conv2D(64, (7, 7), strides=(2, 2), name='conv1', use_bias=True)(x)
