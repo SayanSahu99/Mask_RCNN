@@ -322,7 +322,7 @@ def resnet152_graph(input_image, architecture, stage5=False, train_bn=True):
     assert architecture in ["resnet152"]
     x = KL.ZeroPadding2D((3, 3))(input_image)
     x = KL.Conv2D(64, (7, 7), strides=(2, 2), name='conv1', use_bias=True)(x)
-    x = Scale(axis=bn_axis, name=scale_name_base + '2a')(x)
+    x = Scale(axis=bn_axis, name='scale_conv1')(x)
     x = KL.Activation('relu')(x)
     C1 = x = KL.MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
 
