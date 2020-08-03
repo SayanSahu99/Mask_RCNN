@@ -304,7 +304,7 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
 
 
 def resnet152_graph(input_image, architecture, stage5=False, train_bn=True):
-     """Build a ResNet152 graph.
+    """Build a ResNet152 graph.
         architecture: Can has to be resnet152
         stage5: Boolean. If False, stage5 of the network is not created
         train_bn: Boolean. Train or freeze Batch Norm layres
