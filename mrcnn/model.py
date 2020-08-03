@@ -51,6 +51,7 @@ assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 from keras.layers.core import Layer
 from keras.engine import InputSpec
 from keras import backend as K
+from keras.layers import Dense,  AveragePooling2D, Flatten
 #from keras import initializations
 from keras import initializers as initializations
 try:
