@@ -1292,7 +1292,7 @@ def mrcnn_mask_edge_loss_graph(y_pred, y_true, edge_filters, smoothing_predictio
             loss instead of using it as a L^p norm
     :return: loss
     """
-   
+    print("Please Look at ",y_pred, y_true)
     gaussian_kernel = tf.reshape(tf.constant([[0.077847, 0.123317, 0.077847],
                                               [0.123317, 0.195346, 0.1233179],
                                               [0.077847, 0.123317, 0.077847]], dtype=tf.float32),
@@ -2074,20 +2074,19 @@ class MaskRCNN():
         # Bottom-up Layers
         # Returns a list of the last layers of each stage, 5 in total.
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
-        '''
+    
         if callable(config.BACKBONE):
             _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True,
                                                 train_bn=config.TRAIN_BN)
         else:
             _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
                                              stage5=True, train_bn=config.TRAIN_BN)
-        '''
 
          # added resnet152 callable
-        if callable(config.BACKBONE):
-            _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True, train_bn=config.TRAIN_BN)
-        else:
-            _, C2, C3, C4, C5 = resnet152_graph(input_image, config.BACKBONE, stage5=True, train_bn=config.TRAIN_BN)
+        # if callable(config.BACKBONE):
+        #     _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True, train_bn=config.TRAIN_BN)
+        # else:
+        #     _, C2, C3, C4, C5 = resnet152_graph(input_image, config.BACKBONE, stage5=True, train_bn=config.TRAIN_BN)
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
         P5 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c5p5')(C5)
