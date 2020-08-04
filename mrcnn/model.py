@@ -31,7 +31,7 @@ import keras.models as KM
 import numpy as np
 import skimage.transform
 import tensorflow as tf
-
+import matplotlib.pyplot as plt
 '''from keras.backend.tensorflow_backend import set_session
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.99
@@ -1292,7 +1292,7 @@ def mrcnn_mask_edge_loss_graph(y_pred, y_true, edge_filters, smoothing_predictio
             loss instead of using it as a L^p norm
     :return: loss
     """
-    print("Please Look at ", image)
+    plt.imshow(img)
     gaussian_kernel = tf.reshape(tf.constant([[0.077847, 0.123317, 0.077847],
                                               [0.123317, 0.195346, 0.1233179],
                                               [0.077847, 0.123317, 0.077847]], dtype=tf.float32),
@@ -1401,7 +1401,9 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         defined in MINI_MASK_SHAPE.
     """
     # Load image and mask
+    global img
     image = dataset.load_image(image_id)
+    img = image.copy()
     mask, class_ids = dataset.load_mask(image_id)
     original_shape = image.shape
     image, window, scale, padding, crop = utils.resize_image(
