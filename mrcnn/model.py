@@ -232,55 +232,55 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
     return [C1, C2, C3, C4, C5]
 
 
-def resnet152_graph(input_image, architecture, stage5=False, train_bn=True):
-    """Build a ResNet152 graph.
-        architecture: Can has to be resnet152
-        stage5: Boolean. If False, stage5 of the network is not created
-        train_bn: Boolean. Train or freeze Batch Norm layres
-    """
-    eps = 1.1e-5
+# def resnet152_graph(input_image, architecture, stage5=False, train_bn=True):
+#     """Build a ResNet152 graph.
+#         architecture: Can has to be resnet152
+#         stage5: Boolean. If False, stage5 of the network is not created
+#         train_bn: Boolean. Train or freeze Batch Norm layres
+#     """
+#     eps = 1.1e-5
 
-    # Handle Dimension Ordering for different backends
-    global bn_axis
-    if K.image_data_format() == 'tf':
-      bn_axis = 3
+#     # Handle Dimension Ordering for different backends
+#     global bn_axis
+#     if K.image_data_format() == 'tf':
+#       bn_axis = 3
      
-    else:
-      bn_axis = 1
+#     else:
+#       bn_axis = 1
       
-    assert architecture in ["resnet152"]
-    x = KL.ZeroPadding2D((3, 3))(input_image)
-    x = KL.Conv2D(64, (7, 7), strides=(2, 2), name='conv1', use_bias=True)(x)
-    x = BatchNorm(name='bn_conv1')(x, training=train_bn)
-    x = KL.Activation('relu')(x)
-    C1 = x = KL.MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
+#     assert architecture in ["resnet152"]
+#     x = KL.ZeroPadding2D((3, 3))(input_image)
+#     x = KL.Conv2D(64, (7, 7), strides=(2, 2), name='conv1', use_bias=True)(x)
+#     x = BatchNorm(name='bn_conv1')(x, training=train_bn)
+#     x = KL.Activation('relu')(x)
+#     C1 = x = KL.MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
 
-    #Stage 2
-    x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1), train_bn=train_bn)
-    x = identity_block(x, 3, [64, 64, 256], stage=2, block='b', train_bn=train_bn)
-    C2 = x = identity_block(x, 3, [64, 64, 256], stage=2, block='c', train_bn=train_bn)
+#     #Stage 2
+#     x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1), train_bn=train_bn)
+#     x = identity_block(x, 3, [64, 64, 256], stage=2, block='b', train_bn=train_bn)
+#     C2 = x = identity_block(x, 3, [64, 64, 256], stage=2, block='c', train_bn=train_bn)
 
-    # Stage 3
-    x = conv_block(x, 3, [128, 128, 512], stage=3, block='a')
-    for i in range(1,8):
-      C3 = x = identity_block(x, 3, [128, 128, 512], stage=3, block='b'+str(i), train_bn=train_bn)
+#     # Stage 3
+#     x = conv_block(x, 3, [128, 128, 512], stage=3, block='a')
+#     for i in range(1,8):
+#       C3 = x = identity_block(x, 3, [128, 128, 512], stage=3, block='b'+str(i), train_bn=train_bn)
     
-    # Stage 4
-    x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
-    block_count = {"resnet152": 36}[architecture]
-    for i in range(1,block_count):
-      x = identity_block(x, 3, [256, 256, 1024], stage=4, block='b'+str(i), train_bn=train_bn)
-    C4 = x
+#     # Stage 4
+#     x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
+#     block_count = {"resnet152": 36}[architecture]
+#     for i in range(1,block_count):
+#       x = identity_block(x, 3, [256, 256, 1024], stage=4, block='b'+str(i), train_bn=train_bn)
+#     C4 = x
 
-    # Stage 5
-    if stage5:
-        x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a', train_bn=train_bn)
-        x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b', train_bn=train_bn)
-        x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c', train_bn=train_bn)
-        C5 = x
-    else:
-        C5 = None
-    return [C1, C2, C3, C4, C5]
+#     # Stage 5
+#     if stage5:
+#         x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a', train_bn=train_bn)
+#         x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b', train_bn=train_bn)
+#         x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c', train_bn=train_bn)
+#         C5 = x
+#     else:
+#         C5 = None
+#     return [C1, C2, C3, C4, C5]
 
 
 ############################################################
