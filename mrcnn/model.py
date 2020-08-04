@@ -1292,7 +1292,7 @@ def mrcnn_mask_edge_loss_graph(y_pred, y_true, edge_filters, smoothing_predictio
             loss instead of using it as a L^p norm
     :return: loss
     """
-    print("Please Look at ",y_pred, y_true)
+    print("Please Look at ", image)
     gaussian_kernel = tf.reshape(tf.constant([[0.077847, 0.123317, 0.077847],
                                               [0.123317, 0.195346, 0.1233179],
                                               [0.077847, 0.123317, 0.077847]], dtype=tf.float32),
