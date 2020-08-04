@@ -42,7 +42,7 @@ from mrcnn import utils
 
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
-
+global img
 
 ############################################################
 #  Utility Functions
@@ -1401,7 +1401,6 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         defined in MINI_MASK_SHAPE.
     """
     # Load image and mask
-    global img
     image = dataset.load_image(image_id)
     img = image.copy()
     mask, class_ids = dataset.load_mask(image_id)
