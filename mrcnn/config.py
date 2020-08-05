@@ -211,7 +211,7 @@ class Config(object):
 
     RUN_NAME = None
     EDGE_LOSS_SMOOTHING = False
-    EDGE_LOSS_FILTERS = ["laplace"]
+    EDGE_LOSS_FILTERS = ["canny"]
     EDGE_LOSS_NORM = "l2"
     EDGE_LOSS_WEIGHT_FACTOR = 1.0
     EDGE_LOSS_WEIGHT_ENTROPY = False
