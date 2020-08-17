@@ -211,7 +211,7 @@ class Config(object):
 
     RUN_NAME = None
     EDGE_LOSS_SMOOTHING = False
-    EDGE_LOSS_FILTERS = ["prewitt_x_kernel", "prewitt_x_kernel"]
+    EDGE_LOSS_FILTERS = ["prewitt_x_kernel", "prewitt_y_kernel"]
     EDGE_LOSS_NORM = "l2"
     EDGE_LOSS_WEIGHT_FACTOR = 1.0
     EDGE_LOSS_WEIGHT_ENTROPY = False
@@ -240,5 +240,7 @@ class Config(object):
             if not a.startswith("__") and not callable(getattr(self, a)):
                 print("{:30} {}".format(a, getattr(self, a)), file=file)
         print("\n", file=file)
+
+
 
 
