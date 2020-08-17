@@ -104,13 +104,17 @@ def compute_backbone_shapes(config, image_shape):
         return config.COMPUTE_BACKBONE_SHAPE(image_shape)
 
     # Currently supports ResNet only
-    assert config.BACKBONE in ["resnet50", "resnet101", "resnet152"]
+    assert config.BACKBONE in ["resnet50", "resnet101", "resnet152", "inception"]
     return np.array(
         [[int(math.ceil(image_shape[0] / stride)),
           int(math.ceil(image_shape[1] / stride))]
          for stride in config.BACKBONE_STRIDES])
 
 
+
+############################################################
+#  Inception-ResNet V2 Graph
+############################################################
 
 ############################################################
 #  Inception-ResNet V2 Graph
@@ -123,7 +127,8 @@ def conv2d_bn(x,
               padding='same',
               activation='relu',
               use_bias=False,
-              name=None):
+              name=None,
+              train_bn=True):
     """Utility function to apply conv + BN.
     # Arguments
         x: input tensor.
@@ -146,7 +151,7 @@ def conv2d_bn(x,
     if not use_bias:
         bn_axis = 1 if K.image_data_format() == 'channels_first' else 3
         bn_name = None if name is None else name + '_bn'
-        x = BatchNorm(axis=bn_axis, scale=False, name=bn_name)(x)
+        x = BatchNorm(axis=bn_axis, scale=False, name=bn_name)(x, training=train_bn)
     if activation is not None:
         ac_name = None if name is None else name + '_ac'
         x = KL.Activation(activation, name=ac_name)(x)
@@ -208,12 +213,7 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
                          'Expects "block35", "block17" or "block8", '
                          'but got: ' + str(block_type))
 
-def InceptionResNetV2(include_top=True,
-                      weights='imagenet',
-                      input_tensor=None,
-                      input_shape=None,
-                      pooling=None,
-                      classes=1000):
+def InceptionResNetV2(input_image, architecture, train_bn=True):
     """Instantiates the Inception-ResNet v2 architecture.
     Optionally loads weights pre-trained on ImageNet.
     Note that when using TensorFlow, for best performance you should
@@ -263,13 +263,13 @@ def InceptionResNetV2(include_top=True,
     assert architecture in ["inception"]
 
     # Stem block: 35 x 35 x 192
-    x = conv2d_bn(img_input, 32, 3, strides=2, padding='valid')
+    x = conv2d_bn(input_image, 32, 3, strides=2, padding='valid')
     x = conv2d_bn(x, 32, 3, padding='valid')
     x = conv2d_bn(x, 64, 3)
     x = KL.MaxPooling2D(3, strides=2)(x)
     x = conv2d_bn(x, 80, 1, padding='valid')
     x = conv2d_bn(x, 192, 3, padding='valid')
-    x = KL.MaxPooling2D(3, strides=2)(x)
+    C1 = x = KL.MaxPooling2D(3, strides=2)(x)
 
     # Mixed 5b (Inception-A block): 35 x 35 x 320
     branch_0 = conv2d_bn(x, 96, 1)
@@ -282,7 +282,7 @@ def InceptionResNetV2(include_top=True,
     branch_pool = conv2d_bn(branch_pool, 64, 1)
     branches = [branch_0, branch_1, branch_2, branch_pool]
     channel_axis = 1 if K.image_data_format() == 'channels_first' else 3
-    x = KL.Concatenate(axis=channel_axis, name='mixed_5b')(branches)
+    C2 = x = KL.Concatenate(axis=channel_axis, name='mixed_5b')(branches)
 
     # 10x block35 (Inception-ResNet-A block): 35 x 35 x 320
     for block_idx in range(1, 11):
@@ -298,7 +298,7 @@ def InceptionResNetV2(include_top=True,
     branch_1 = conv2d_bn(branch_1, 384, 3, strides=2, padding='valid')
     branch_pool = KL.MaxPooling2D(3, strides=2, padding='valid')(x)
     branches = [branch_0, branch_1, branch_pool]
-    x = KL.Concatenate(axis=channel_axis, name='mixed_6a')(branches)
+    C3 = x = KL.Concatenate(axis=channel_axis, name='mixed_6a')(branches)
 
     # 20x block17 (Inception-ResNet-B block): 17 x 17 x 1088
     for block_idx in range(1, 21):
@@ -317,7 +317,7 @@ def InceptionResNetV2(include_top=True,
     branch_2 = conv2d_bn(branch_2, 320, 3, strides=2, padding='valid')
     branch_pool = KL.MaxPooling2D(3, strides=2, padding='valid')(x)
     branches = [branch_0, branch_1, branch_2, branch_pool]
-    x = KL.Concatenate(axis=channel_axis, name='mixed_7a')(branches)
+    C4 = x = KL.Concatenate(axis=channel_axis, name='mixed_7a')(branches)
 
     # 10x block8 (Inception-ResNet-C block): 8 x 8 x 2080
     for block_idx in range(1, 10):
@@ -332,7 +332,11 @@ def InceptionResNetV2(include_top=True,
                                block_idx=10)
 
     # Final convolution block: 8 x 8 x 1536
-    x = conv2d_bn(x, 1536, 1, name='conv_7b')
+    C5 = x = conv2d_bn(x, 1536, 1, name='conv_7b')
+
+    return [C1, C2, C3, C4, C5]
+
+    
 
     
 
@@ -2357,12 +2361,19 @@ class MaskRCNN():
         # Returns a list of the last layers of each stage, 5 in total.
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
     
+        # if callable(config.BACKBONE):
+        #     _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True,
+        #                                         train_bn=config.TRAIN_BN)
+        # else:
+        #     _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
+        #                                      stage5=True, train_bn=config.TRAIN_BN)
+
         if callable(config.BACKBONE):
             _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True,
                                                 train_bn=config.TRAIN_BN)
         else:
-            _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
-                                             stage5=True, train_bn=config.TRAIN_BN)
+            _, C2, C3, C4, C5 = InceptionResNetV2(input_image, config.BACKBONE,
+                                                 train_bn=config.TRAIN_BN)
 
          # added resnet152 callable
         # if callable(config.BACKBONE):
