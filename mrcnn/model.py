@@ -116,9 +116,6 @@ def compute_backbone_shapes(config, image_shape):
 #  Inception-ResNet V2 Graph
 ############################################################
 
-############################################################
-#  Inception-ResNet V2 Graph
-############################################################
 
 def conv2d_bn(x,
               filters,
@@ -126,7 +123,7 @@ def conv2d_bn(x,
               strides=1,
               padding='same',
               activation='relu',
-              use_bias=False,
+              use_bias=True,
               name=None,
               train_bn=True):
     """Utility function to apply conv + BN.
