@@ -219,7 +219,7 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
                    use_bias=True,
                    name=block_name + '_conv')
 
-    x = Lambda(lambda inputs, scale: inputs[0] + inputs[1] * scale,
+    x = KL.Lambda(lambda inputs, scale: inputs[0] + inputs[1] * scale,
                output_shape=K.int_shape(x)[1:],
                arguments={'scale': scale},
                name=block_name)([x, up])
