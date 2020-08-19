@@ -209,6 +209,23 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
         raise ValueError('Unknown Inception-ResNet block type. '
                          'Expects "block35", "block17" or "block8", '
                          'but got: ' + str(block_type))
+    block_name = block_type + '_' + str(block_idx)
+    channel_axis = 1 if K.image_data_format() == 'channels_first' else 3
+    mixed = Concatenate(axis=channel_axis, name=block_name + '_mixed')(branches)
+    up = conv2d_bn(mixed,
+                   K.int_shape(x)[channel_axis],
+                   1,
+                   activation=None,
+                   use_bias=True,
+                   name=block_name + '_conv')
+
+    x = Lambda(lambda inputs, scale: inputs[0] + inputs[1] * scale,
+               output_shape=K.int_shape(x)[1:],
+               arguments={'scale': scale},
+               name=block_name)([x, up])
+    if activation is not None:
+        x = Activation(activation, name=block_name + '_ac')(x)
+    return x
 
 def InceptionResNetV2(input_image, architecture, train_bn=True):
     """Instantiates the Inception-ResNet v2 architecture.
