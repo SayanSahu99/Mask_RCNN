@@ -310,9 +310,9 @@ def InceptionResNetV2(input_image, architecture, train_bn=True):
     branch_1 = conv2d_bn(x, 256, 1)
     branch_1 = conv2d_bn(branch_1, 256, 3)
     branch_1 = conv2d_bn(branch_1, 384, 3, strides=2, padding='valid')
-    branch_pool = KL.MaxPooling2D(3, strides=2, padding='valid')(x)
+    C3 = branch_pool = KL.MaxPooling2D(3, strides=2, padding='valid')(x)
     branches = [branch_0, branch_1, branch_pool]
-    C3 = x = KL.Concatenate(axis=channel_axis, name='mixed_6a')(branches)
+    x = KL.Concatenate(axis=channel_axis, name='mixed_6a')(branches)
 
     # 20x block17 (Inception-ResNet-B block): 17 x 17 x 1088
     for block_idx in range(1, 21):
@@ -329,9 +329,9 @@ def InceptionResNetV2(input_image, architecture, train_bn=True):
     branch_2 = conv2d_bn(x, 256, 1)
     branch_2 = conv2d_bn(branch_2, 288, 3)
     branch_2 = conv2d_bn(branch_2, 320, 3, strides=2, padding='valid')
-    branch_pool = KL.MaxPooling2D(3, strides=2, padding='valid')(x)
+    C4 = branch_pool = KL.MaxPooling2D(3, strides=2, padding='valid')(x)
     branches = [branch_0, branch_1, branch_2, branch_pool]
-    C4 = x = KL.Concatenate(axis=channel_axis, name='mixed_7a')(branches)
+    x = KL.Concatenate(axis=channel_axis, name='mixed_7a')(branches)
 
     # 10x block8 (Inception-ResNet-C block): 8 x 8 x 2080
     for block_idx in range(1, 10):
@@ -339,14 +339,14 @@ def InceptionResNetV2(input_image, architecture, train_bn=True):
                                    scale=0.2,
                                    block_type='block8',
                                    block_idx=block_idx)
-    x = inception_resnet_block(x,
+    C5 = x = inception_resnet_block(x,
                                scale=1.,
                                activation=None,
                                block_type='block8',
                                block_idx=10)
 
     # Final convolution block: 8 x 8 x 1536
-    C5 = x = conv2d_bn(x, 1536, 1, name='conv_7b')
+    x = conv2d_bn(x, 1536, 1, name='conv_7b')
 
     return [C1, C2, C3, C4, C5]
 
