@@ -348,7 +348,7 @@ def InceptionResNetV2(input_image, architecture, train_bn=True):
     # Final convolution block: 8 x 8 x 1536
     C5 = x = conv2d_bn(x, 1536, 1, name='conv_7b')
 
-    return [_, _, _, _, _]
+    return [C1, C2, C3, C4, C5]
 
     
 
