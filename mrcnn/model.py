@@ -282,8 +282,8 @@ def InceptionResNetV2(input_image, architecture, train_bn=True):
     x = conv2d_bn(x, 64, 3)
     x = KL.MaxPooling2D(3, strides=2)(x)
     x = conv2d_bn(x, 80, 1, padding='valid')
-    x = conv2d_bn(x, 192, 3, padding='valid')
-    C1 = x = KL.MaxPooling2D(3, strides=2)(x)
+    C1 = x = conv2d_bn(x, 192, 3, padding='valid')
+    x = KL.MaxPooling2D(3, strides=2)(x)
 
     # Mixed 5b (Inception-A block): 35 x 35 x 320
     branch_0 = conv2d_bn(x, 96, 1)
